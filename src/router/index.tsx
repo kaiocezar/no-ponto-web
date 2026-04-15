@@ -14,6 +14,8 @@ const ProviderProfilePage = lazy(() => import('@/pages/public/provider-profile/P
 const BookingPage = lazy(() => import('@/pages/public/booking/BookingPage'))
 const DashboardAgendaPage = lazy(() => import('@/pages/dashboard/agenda/AgendaPage'))
 const ProfileSetupPage = lazy(() => import('@/pages/dashboard/profile-setup/ProfileSetupPage'))
+const WorkingHoursPage = lazy(() => import('@/pages/dashboard/settings/WorkingHoursPage'))
+const ScheduleBlocksPage = lazy(() => import('@/pages/dashboard/settings/ScheduleBlocksPage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 
 function LoadingFallback() {
@@ -77,7 +79,14 @@ export const router = createBrowserRouter([
         path: '/configurar-perfil',
         element: withSuspense(ProfileSetupPage),
       },
-      // TODO: adicionar demais rotas do painel conforme as tasks forem implementadas
+      {
+        path: '/painel/configuracoes/horarios',
+        element: withSuspense(WorkingHoursPage),
+      },
+      {
+        path: '/painel/configuracoes/bloqueios',
+        element: withSuspense(ScheduleBlocksPage),
+      },
     ],
   },
 
