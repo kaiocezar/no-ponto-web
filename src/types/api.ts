@@ -176,16 +176,16 @@ export const WEEKDAY_LABELS: Record<Weekday, string> = {
 
 export interface WorkingHours {
   id: string
-  day_of_week: Weekday
-  open_time: string  // HH:MM
-  close_time: string // HH:MM
+  weekday: Weekday
+  start_time: string  // HH:MM
+  end_time: string    // HH:MM
   is_active: boolean
 }
 
 export interface WorkingHoursPayload {
-  day_of_week: Weekday
-  open_time: string
-  close_time: string
+  weekday: Weekday
+  start_time: string
+  end_time: string
   is_active: boolean
 }
 
