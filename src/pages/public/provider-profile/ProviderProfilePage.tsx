@@ -2,6 +2,14 @@ import { useParams } from 'react-router-dom'
 import axios from 'axios'
 
 import { usePublicProfile } from '@features/providers/hooks/usePublicProfile'
+import type { Service } from '@/types/api'
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+const formatBRL = (value: string) =>
+  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(value))
+
+// ── Subcomponentes ────────────────────────────────────────────────────────────
 
 function ProfileSkeleton() {
   return (
@@ -22,9 +30,35 @@ function ProfileSkeleton() {
   )
 }
 
+interface ServiceCardProps {
+  service: Service
+}
+
+function ServiceCard({ service }: ServiceCardProps) {
+  return (
+    <div className="flex items-start justify-between px-4 py-3">
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-gray-900">{service.name}</p>
+        {service.description && (
+          <p className="text-xs text-gray-500 mt-0.5">{service.description}</p>
+        )}
+        <p className="text-xs text-gray-400 mt-0.5">{service.duration_minutes} min</p>
+      </div>
+      {service.price && (
+        <span className="ml-4 text-sm font-semibold text-gray-900 whitespace-nowrap">
+          {formatBRL(service.price)}
+        </span>
+      )}
+    </div>
+  )
+}
+
+// ── Página principal ──────────────────────────────────────────────────────────
+
 export default function ProviderProfilePage() {
   const { slug } = useParams<{ slug: string }>()
   const { data: profile, isLoading, error } = usePublicProfile(slug ?? '')
+  const services = profile?.services ?? []
 
   if (isLoading) {
     return <ProfileSkeleton />
@@ -86,6 +120,22 @@ export default function ProviderProfilePage() {
           <p className="text-sm text-gray-600 leading-relaxed">{profile.bio}</p>
         </div>
       )}
+
+      {/* Servicos */}
+      <div className="mb-6">
+        <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
+          Servicos
+        </h2>
+        {services.length > 0 ? (
+          <div className="rounded-lg border border-gray-200 divide-y divide-gray-100">
+            {services.map((service) => (
+              <ServiceCard key={service.id} service={service} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500">Nenhum serviço cadastrado.</p>
+        )}
+      </div>
 
       {/* Contato */}
       {profile.whatsapp_number && (

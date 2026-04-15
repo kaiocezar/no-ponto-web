@@ -106,11 +106,20 @@ export interface ProviderProfile {
   average_rating: number | null
   rating_average: number | null
   total_reviews: number
+  services?: Service[]
   created_at: string
   updated_at: string
 }
 
 // ── Service ───────────────────────────────────────────────────────────────────
+
+export interface CreateServicePayload {
+  name: string
+  description?: string
+  price: string  // decimal como string, ex: "150.00"
+  duration_minutes: number  // minutos
+  is_active?: boolean
+}
 
 export interface Service {
   id: string
@@ -157,6 +166,65 @@ export interface Appointment {
   price_at_booking: string | null
   deposit_paid: boolean
   created_at: string
+}
+
+// ── Working Hours ─────────────────────────────────────────────────────────────
+
+/** 0 = domingo, 1 = segunda … 6 = sábado */
+export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6
+
+export const WEEKDAY_LABELS: Record<Weekday, string> = {
+  0: 'Domingo',
+  1: 'Segunda-feira',
+  2: 'Terça-feira',
+  3: 'Quarta-feira',
+  4: 'Quinta-feira',
+  5: 'Sexta-feira',
+  6: 'Sábado',
+}
+
+export interface WorkingHours {
+  id: string
+  weekday: Weekday
+  start_time: string  // HH:MM
+  end_time: string    // HH:MM
+  is_active: boolean
+}
+
+export interface WorkingHoursPayload {
+  weekday: Weekday
+  start_time: string
+  end_time: string
+  is_active: boolean
+}
+
+export interface WorkingHoursBulkPayload {
+  working_hours: WorkingHoursPayload[]
+}
+
+// ── Schedule Blocks ───────────────────────────────────────────────────────────
+
+export interface ScheduleBlock {
+  id: string
+  start_datetime: string // ISO 8601
+  end_datetime: string
+  reason: string | null
+  is_recurring: boolean
+  recurrence_rule: string
+  created_at: string
+}
+
+export interface ScheduleBlockPayload {
+  start_datetime: string
+  end_datetime: string
+  reason?: string
+  is_recurring?: boolean
+  recurrence_rule?: string
+}
+
+export interface ScheduleBlockFilters {
+  from?: string
+  until?: string
 }
 
 // ── Availability ──────────────────────────────────────────────────────────────

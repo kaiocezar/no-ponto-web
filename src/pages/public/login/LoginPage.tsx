@@ -37,7 +37,7 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
+          <form onSubmit={(e) => { void handleSubmit(onSubmit)(e) }} className="flex flex-col gap-4" noValidate>
             <Input
               label="Email"
               type="email"
