@@ -159,6 +159,61 @@ export interface Appointment {
   created_at: string
 }
 
+// ── Working Hours ─────────────────────────────────────────────────────────────
+
+/** 0 = domingo, 1 = segunda … 6 = sábado */
+export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6
+
+export const WEEKDAY_LABELS: Record<Weekday, string> = {
+  0: 'Domingo',
+  1: 'Segunda-feira',
+  2: 'Terça-feira',
+  3: 'Quarta-feira',
+  4: 'Quinta-feira',
+  5: 'Sexta-feira',
+  6: 'Sábado',
+}
+
+export interface WorkingHours {
+  id: string
+  day_of_week: Weekday
+  open_time: string  // HH:MM
+  close_time: string // HH:MM
+  is_active: boolean
+}
+
+export interface WorkingHoursPayload {
+  day_of_week: Weekday
+  open_time: string
+  close_time: string
+  is_active: boolean
+}
+
+export interface WorkingHoursBulkPayload {
+  working_hours: WorkingHoursPayload[]
+}
+
+// ── Schedule Blocks ───────────────────────────────────────────────────────────
+
+export interface ScheduleBlock {
+  id: string
+  start_datetime: string // ISO 8601
+  end_datetime: string
+  reason: string | null
+  created_at: string
+}
+
+export interface ScheduleBlockPayload {
+  start_datetime: string
+  end_datetime: string
+  reason?: string
+}
+
+export interface ScheduleBlockFilters {
+  from?: string
+  until?: string
+}
+
 // ── Availability ──────────────────────────────────────────────────────────────
 
 export interface AvailableSlot {
