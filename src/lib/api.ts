@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import { useAuthStore } from '@store/authStore'
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 export const api = axios.create({
   baseURL: `${BASE_URL}/api/v1`,
@@ -40,7 +40,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
 api.interceptors.response.use(
   (response) => response,
   async (error: unknown) => {
-    if (!axios.isAxiosError(error)) return Promise.reject(error)
+    if (!axios.isAxiosError(error)) return Promise.reject(new Error(String(error)))
 
     const originalRequest = error.config
     if (!originalRequest) return Promise.reject(error)
@@ -54,7 +54,7 @@ api.interceptors.response.use(
             originalRequest.headers.Authorization = `Bearer ${token}`
             return api(originalRequest)
           })
-          .catch((err: unknown) => Promise.reject(err))
+          .catch((err: unknown) => Promise.reject(err instanceof Error ? err : new Error(String(err))))
       }
 
       ;(originalRequest as typeof originalRequest & { _retry: boolean })._retry = true
@@ -75,11 +75,11 @@ api.interceptors.response.use(
         useAuthStore.getState().setTokens(data.access, refreshToken)
         processQueue(null, data.access)
         originalRequest.headers.Authorization = `Bearer ${data.access}`
-        return api(originalRequest)
+        return await api(originalRequest)
       } catch (refreshError) {
         processQueue(refreshError, null)
         useAuthStore.getState().logout()
-        return Promise.reject(refreshError)
+        throw refreshError instanceof Error ? refreshError : new Error(String(refreshError))
       } finally {
         isRefreshing = false
       }

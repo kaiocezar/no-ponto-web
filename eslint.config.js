@@ -6,9 +6,10 @@ import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   { ignores: ['dist', 'node_modules'] },
+  // App (src/)
   {
     extends: [js.configs.recommended, ...tseslint.configs.strictTypeChecked],
-    files: ['**/*.{ts,tsx}'],
+    files: ['src/**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2022,
       globals: globals.browser,
@@ -32,6 +33,24 @@ export default tseslint.config(
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
+    },
+  },
+  // Config files (vite, tailwind, playwright) — sem type-aware rules (Node env sem @types/node)
+  {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ['*.config.ts'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      globals: globals.node,
+    },
+  },
+  // E2E tests — sem type-aware rules
+  {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ['e2e/**/*.ts'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      globals: globals.node,
     },
   },
 )

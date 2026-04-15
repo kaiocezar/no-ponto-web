@@ -106,11 +106,20 @@ export interface ProviderProfile {
   average_rating: number | null
   rating_average: number | null
   total_reviews: number
+  services?: Service[]
   created_at: string
   updated_at: string
 }
 
 // ── Service ───────────────────────────────────────────────────────────────────
+
+export interface CreateServicePayload {
+  name: string
+  description?: string
+  price: string  // decimal como string, ex: "150.00"
+  duration_minutes: number  // minutos
+  is_active?: boolean
+}
 
 export interface Service {
   id: string
@@ -200,6 +209,8 @@ export interface ScheduleBlock {
   start_datetime: string // ISO 8601
   end_datetime: string
   reason: string | null
+  is_recurring: boolean
+  recurrence_rule: string
   created_at: string
 }
 
@@ -207,6 +218,8 @@ export interface ScheduleBlockPayload {
   start_datetime: string
   end_datetime: string
   reason?: string
+  is_recurring?: boolean
+  recurrence_rule?: string
 }
 
 export interface ScheduleBlockFilters {
