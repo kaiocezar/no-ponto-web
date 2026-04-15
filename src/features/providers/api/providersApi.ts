@@ -1,5 +1,5 @@
 import api from '@lib/api'
-import type { ProviderProfile, ServiceCategory } from '@/types/api'
+import type { CreateServicePayload, ProviderProfile, Service, ServiceCategory } from '@/types/api'
 
 export const providersApi = {
   /**
@@ -53,6 +53,52 @@ export const providersApi = {
    */
   getCategories: async (): Promise<ServiceCategory[]> => {
     const { data } = await api.get<ServiceCategory[]>('/categories/')
+    return data
+  },
+
+  // ── Serviços do prestador autenticado ─────────────────────────────────────
+
+  /**
+   * Lista os serviços do prestador autenticado.
+   * GET /providers/me/services/
+   */
+  listMyServices: async (): Promise<Service[]> => {
+    const { data } = await api.get<Service[]>('/providers/me/services/')
+    return data
+  },
+
+  /**
+   * Cria um novo serviço para o prestador autenticado.
+   * POST /providers/me/services/
+   */
+  createService: async (payload: CreateServicePayload): Promise<Service> => {
+    const { data } = await api.post<Service>('/providers/me/services/', payload)
+    return data
+  },
+
+  /**
+   * Atualiza parcialmente um serviço do prestador autenticado.
+   * PATCH /providers/me/services/{id}/
+   */
+  updateService: async (id: string, payload: Partial<CreateServicePayload>): Promise<Service> => {
+    const { data } = await api.patch<Service>(`/providers/me/services/${id}/`, payload)
+    return data
+  },
+
+  /**
+   * Remove (soft delete) um serviço do prestador autenticado.
+   * DELETE /providers/me/services/{id}/
+   */
+  deleteService: async (id: string): Promise<void> => {
+    await api.delete(`/providers/me/services/${id}/`)
+  },
+
+  /**
+   * Lista os serviços públicos de um prestador pelo slug.
+   * GET /providers/{slug}/services/
+   */
+  getPublicServices: async (slug: string): Promise<Service[]> => {
+    const { data } = await api.get<Service[]>(`/providers/${slug}/services/`)
     return data
   },
 }
