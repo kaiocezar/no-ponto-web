@@ -7,9 +7,17 @@ interface UseAvailabilityParams {
   serviceId: string
   date: string
   staffId?: string
+  /** Se omitido, habilita quando slug, serviceId e date estão preenchidos. */
+  enabled?: boolean
 }
 
-export function useAvailability({ slug, serviceId, date, staffId }: UseAvailabilityParams) {
+export function useAvailability({
+  slug,
+  serviceId,
+  date,
+  staffId,
+  enabled,
+}: UseAvailabilityParams) {
   return useQuery({
     queryKey: schedulingKeys.availability.detail(slug, serviceId, date, staffId),
     queryFn: () =>
@@ -18,7 +26,7 @@ export function useAvailability({ slug, serviceId, date, staffId }: UseAvailabil
         date,
         staff_id: staffId,
       }),
-    enabled: Boolean(slug && serviceId && date),
+    enabled: enabled ?? Boolean(slug && serviceId && date),
     staleTime: 1000 * 60 * 5, // 5 minutos — alinhado com cache Redis do backend
   })
 }
