@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 
 import { PublicLayout } from '@/components/shared/PublicLayout'
 import { DashboardLayout } from '@/components/shared/DashboardLayout'
@@ -71,6 +71,10 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
+      {
+        path: '/painel',
+        element: <Navigate to="/painel/agenda" replace />,
+      },
       {
         path: '/painel/agenda',
         element: withSuspense(DashboardAgendaPage),

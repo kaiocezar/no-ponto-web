@@ -28,7 +28,7 @@ export function useLogin() {
     mutationFn: (payload: LoginPayload) => authApi.login(payload),
     onSuccess: (data) => {
       setTokens(data.access, data.refresh)
-      void navigate('/painel')
+      void navigate('/painel/agenda')
     },
   })
 
