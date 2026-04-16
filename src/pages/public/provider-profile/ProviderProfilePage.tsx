@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import axios from 'axios'
 
 import { usePublicProfile } from '@features/providers/hooks/usePublicProfile'
@@ -32,11 +32,13 @@ function ProfileSkeleton() {
 
 interface ServiceCardProps {
   service: Service
+  slug: string
 }
 
-function ServiceCard({ service }: ServiceCardProps) {
+function ServiceCard({ service, slug }: ServiceCardProps) {
+  const canBookOnline = service.is_active && service.is_online
   return (
-    <div className="flex items-start justify-between px-4 py-3">
+    <div className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-gray-900">{service.name}</p>
         {service.description && (
@@ -44,11 +46,21 @@ function ServiceCard({ service }: ServiceCardProps) {
         )}
         <p className="text-xs text-gray-400 mt-0.5">{service.duration_minutes} min</p>
       </div>
-      {service.price && (
-        <span className="ml-4 text-sm font-semibold text-gray-900 whitespace-nowrap">
-          {formatBRL(service.price)}
-        </span>
-      )}
+      <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
+        {service.price && (
+          <span className="text-sm font-semibold text-gray-900 whitespace-nowrap">
+            {formatBRL(service.price)}
+          </span>
+        )}
+        {canBookOnline && (
+          <Link
+            to={`/${slug}/agendar?service_id=${service.id}`}
+            className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-3 py-1.5 text-center text-xs font-medium text-white hover:bg-primary-700"
+          >
+            Agendar
+          </Link>
+        )}
+      </div>
     </div>
   )
 }
@@ -129,7 +141,7 @@ export default function ProviderProfilePage() {
         {services.length > 0 ? (
           <div className="rounded-lg border border-gray-200 divide-y divide-gray-100">
             {services.map((service) => (
-              <ServiceCard key={service.id} service={service} />
+              <ServiceCard key={service.id} service={service} slug={profile.slug} />
             ))}
           </div>
         ) : (

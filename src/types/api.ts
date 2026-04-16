@@ -168,6 +168,37 @@ export interface Appointment {
   created_at: string
 }
 
+export interface CreateAppointmentPayload {
+  provider_slug: string
+  service_id: string
+  start_datetime: string
+  client_name: string
+  client_phone: string
+  client_email?: string
+  notes?: string
+}
+
+export interface AppointmentPublicBookingResponse {
+  public_id: string
+  status: AppointmentStatus
+  start_datetime: string
+  end_datetime: string
+  service: { id: string; name: string; duration_minutes: number }
+  provider: { slug: string; business_name: string }
+}
+
+export interface AppointmentLookup {
+  public_id: string
+  status: AppointmentStatus
+  start_datetime: string
+  end_datetime: string
+  client_name: string
+  service: { id: string; name: string; duration_minutes: number }
+  provider: { slug: string; business_name: string }
+  notes: string | null
+  price_at_booking: string | null
+}
+
 // ── Working Hours ─────────────────────────────────────────────────────────────
 
 /** 0 = domingo, 1 = segunda … 6 = sábado */

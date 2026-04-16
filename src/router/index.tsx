@@ -12,6 +12,9 @@ const RegisterPage = lazy(() => import('@/pages/public/register/RegisterPage'))
 const LoginPage = lazy(() => import('@/pages/public/login/LoginPage'))
 const ProviderProfilePage = lazy(() => import('@/pages/public/provider-profile/ProviderProfilePage'))
 const BookingPage = lazy(() => import('@/pages/public/booking/BookingPage'))
+const BookingConfirmationPage = lazy(
+  () => import('@/pages/public/booking/BookingConfirmationPage'),
+)
 const DashboardAgendaPage = lazy(() => import('@/pages/dashboard/agenda/AgendaPage'))
 const ProfileSetupPage = lazy(() => import('@/pages/dashboard/profile-setup/ProfileSetupPage'))
 const WorkingHoursPage = lazy(() => import('@/pages/dashboard/settings/WorkingHoursPage'))
@@ -54,6 +57,10 @@ export const router = createBrowserRouter([
       {
         path: '/:slug/agendar',
         element: withSuspense(BookingPage),
+      },
+      {
+        path: '/:slug/agendamento/:publicId',
+        element: withSuspense(BookingConfirmationPage),
       },
       // /:slug deve ser a última rota pública para não conflitar com as anteriores
       {
