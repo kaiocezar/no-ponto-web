@@ -12,6 +12,7 @@ export interface User {
   phone_number: string | null
   full_name: string
   avatar_url: string | null
+  birth_date?: string | null
   role: 'client' | 'provider' | 'admin' | 'staff'
 }
 
@@ -34,6 +35,28 @@ export interface AuthTokens {
 export interface AuthResponse {
   user: User
   tokens: AuthTokens
+}
+
+export interface RequestOTPPayload {
+  phone: string
+}
+
+export interface VerifyOTPPayload {
+  phone: string
+  code: string
+}
+
+export interface VerifyOTPResponse extends AuthTokens {
+  is_new_user: boolean
+}
+
+export interface CompleteProfilePayload {
+  full_name: string
+}
+
+export interface UpdateMePayload {
+  email?: string
+  birth_date?: string
 }
 
 export interface PaginatedResponse<T> {

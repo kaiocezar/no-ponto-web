@@ -1,5 +1,16 @@
 import api from '@lib/api'
-import type { RegisterPayload, LoginPayload, AuthResponse, AuthTokens } from '@/types/api'
+import type {
+  RegisterPayload,
+  LoginPayload,
+  AuthResponse,
+  AuthTokens,
+  RequestOTPPayload,
+  VerifyOTPPayload,
+  VerifyOTPResponse,
+  CompleteProfilePayload,
+  UpdateMePayload,
+  User,
+} from '@/types/api'
 
 export const authApi = {
   /**
@@ -18,6 +29,25 @@ export const authApi = {
    */
   login: async (payload: LoginPayload): Promise<AuthTokens> => {
     const { data } = await api.post<AuthTokens>('/accounts/login/', payload)
+    return data
+  },
+
+  requestOTP: async (phone: RequestOTPPayload['phone']): Promise<void> => {
+    await api.post('/accounts/request-otp/', { phone })
+  },
+
+  verifyOTP: async (phone: VerifyOTPPayload['phone'], code: VerifyOTPPayload['code']): Promise<VerifyOTPResponse> => {
+    const { data } = await api.post<VerifyOTPResponse>('/accounts/verify-otp/', { phone, code })
+    return data
+  },
+
+  completeProfile: async (fullName: CompleteProfilePayload['full_name']): Promise<User> => {
+    const { data } = await api.post<User>('/accounts/complete-profile/', { full_name: fullName })
+    return data
+  },
+
+  updateMe: async (payload: UpdateMePayload): Promise<User> => {
+    const { data } = await api.patch<User>('/accounts/me/', payload)
     return data
   },
 }
