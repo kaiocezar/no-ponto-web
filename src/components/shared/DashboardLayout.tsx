@@ -1,11 +1,25 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { useMemo } from 'react'
+
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom'
+
 import { Avatar } from '@components/ui/Avatar'
+import { AppointmentBadge } from '@features/appointments/provider/components/AppointmentBadge'
+import { useProviderAppointments } from '@features/appointments/provider/hooks/useProviderAppointments'
 import { useAuthStore } from '@store/authStore'
 
 interface NavItem {
   to: string
   label: string
   icon: React.ReactNode
+  showPendingBadge?: boolean
+}
+
+function todayIsoDate(): string {
+  const d = new Date()
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${String(y)}-${m}-${day}`
 }
 
 function CalendarIcon() {
@@ -54,12 +68,18 @@ const navItems: NavItem[] = [
     to: '/painel/agenda',
     label: 'Agenda',
     icon: <CalendarIcon />,
+    showPendingBadge: true,
   },
 ]
 
 export function DashboardLayout() {
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
+  const location = useLocation()
+  const today = useMemo(() => todayIsoDate(), [])
+  const pendingToday = useProviderAppointments(today, today, 'pending_confirmation')
+  const pendingCount =
+    location.pathname.startsWith('/painel/agenda') ? 0 : (pendingToday.data?.length ?? 0)
 
   const displayName = user?.full_name ?? 'Dr. Lucas Silva'
   const displaySubtitle = user?.email ?? 'Profissional de saúde'
@@ -94,7 +114,7 @@ export function DashboardLayout() {
               to={item.to}
               className={({ isActive }) =>
                 [
-                  'flex items-center gap-[10px] rounded-lg px-3 py-[10px] text-[13px] transition-colors',
+                  'flex w-full items-center gap-[10px] rounded-lg px-3 py-[10px] text-[13px] transition-colors',
                   isActive
                     ? 'bg-primary-600 font-semibold text-white'
                     : 'font-normal text-white/55 hover:bg-white/[.08]',
@@ -102,7 +122,8 @@ export function DashboardLayout() {
               }
             >
               {item.icon}
-              {item.label}
+              <span className="flex-1 text-left">{item.label}</span>
+              {item.showPendingBadge ? <AppointmentBadge count={pendingCount} /> : null}
             </NavLink>
           ))}
         </nav>

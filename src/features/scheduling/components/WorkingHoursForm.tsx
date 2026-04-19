@@ -94,6 +94,9 @@ export function WorkingHoursForm({ initialData = [], onSuccess }: WorkingHoursFo
           <tbody className="divide-y divide-gray-100">
             {WEEKDAYS.map((day, index) => {
               const fieldNames = DAY_FIELD_NAMES[index]
+              if (!fieldNames) {
+                return null
+              }
               return (
                 <tr key={day} className="bg-white hover:bg-gray-50">
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">

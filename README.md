@@ -59,7 +59,46 @@ npm run lint          # Análise ESLint
 npm run lint:fix      # ESLint com correção automática
 npm run format        # Formata com Prettier
 npm run format:check  # Verifica formatação sem alterar
+npm run test          # Vitest (testes unitários / integração em src/)
+npm run type-check:e2e # TypeScript apenas da pasta e2e/ (tsconfig.e2e.json)
+npm run test:e2e      # Playwright — ver secção abaixo
 ```
+
+## Testes E2E (Playwright)
+
+Os ficheiros vivem em **`e2e/`**. O `playwright.config.ts` sobe o backend (`../backend`, porta **8001**) e o Vite em paralelo, salvo se já estiverem a correr (`reuseExistingServer`).
+
+**Instalação única do browser (Chromium):**
+
+```bash
+npx playwright install chromium
+```
+
+**Variáveis de ambiente dos testes**
+
+| Variável | Obrigatório | Descrição |
+|----------|-------------|-----------|
+| `E2E_PROVIDER_EMAIL` | Para `e2e/painel-prestador-agenda.spec.ts` | Email de um utilizador **prestador** existente na base usada pelo backend |
+| `E2E_PROVIDER_PASSWORD` | Idem | Palavra-passe desse prestador |
+| `E2E_PUBLIC_ID` | Para `e2e/cancelamento-reagendamento-publico.spec.ts` | `public_id` do agendamento (ex.: `AGD-XXXX`) |
+| `E2E_PHONE` | Opcional nesse fluxo | Telefone associado ao agendamento (normalizado como no fluxo público); padrão no spec: `+5511997777666` |
+
+Se `E2E_PROVIDER_EMAIL` / `E2E_PROVIDER_PASSWORD` não estiverem definidos, o spec do **painel da agenda** é **ignorado** (`test.skip`) para o CI passar sem credenciais.
+
+**Exemplos**
+
+```bash
+# Só specs que não exigem segredos (ou com skip)
+npm run test:e2e
+
+# Painel do prestador — login real
+E2E_PROVIDER_EMAIL=prestador@exemplo.com E2E_PROVIDER_PASSWORD='sua-senha' npm run test:e2e -- e2e/painel-prestador-agenda.spec.ts
+
+# Cancelamento / reagendamento público
+E2E_PUBLIC_ID=AGD-ABCD npm run test:e2e -- e2e/cancelamento-reagendamento-publico.spec.ts
+```
+
+O type-check da app (`npm run type-check`) não inclui `e2e/`; para validar tipos dos specs use `npm run type-check:e2e`.
 
 ## Estrutura de pastas
 

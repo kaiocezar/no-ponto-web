@@ -210,6 +210,44 @@ export interface AppointmentPublicBookingResponse {
   provider: { slug: string; business_name: string }
 }
 
+/** Lista / detalhe em `/providers/me/appointments/` (painel prestador) */
+export interface ProviderAppointmentServiceBrief {
+  id: string
+  name: string
+  duration_minutes: number
+}
+
+export interface ProviderAppointmentListRow {
+  id: string
+  public_id: string
+  client_name: string
+  client_phone: string
+  service: ProviderAppointmentServiceBrief
+  status: AppointmentStatus
+  start_datetime: string
+  end_datetime: string
+  origin: AppointmentOrigin
+}
+
+export interface ProviderAppointmentDetail extends ProviderAppointmentListRow {
+  client_email: string
+  notes: string
+  internal_notes: string
+  cancelled_by: string | null
+  cancellation_reason: string | null
+  created_at: string
+}
+
+export interface ProviderManualBookingPayload {
+  service_id: string
+  start_datetime: string
+  client_name: string
+  client_phone: string
+  origin: 'phone' | 'walk_in'
+  notes?: string
+  internal_notes?: string
+}
+
 export interface AppointmentLookup {
   id: string
   public_id: string
