@@ -4,7 +4,9 @@ import axios from 'axios'
 
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { OptionalDataPrompt } from '@features/auth'
 import { useAppointmentLookup } from '@features/scheduling/hooks/useAppointments'
+import { useAuthStore } from '@store/authStore'
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString('pt-BR', {
@@ -18,6 +20,7 @@ export default function BookingConfirmationPage() {
   const [phoneDraft, setPhoneDraft] = useState('')
   const [submittedPhone, setSubmittedPhone] = useState<string | null>(null)
   const [hydrated, setHydrated] = useState(false)
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
 
   useEffect(() => {
     if (!publicId) {
@@ -129,6 +132,8 @@ export default function BookingConfirmationPage() {
       <p className="mt-8 rounded-lg border border-primary-100 bg-primary-50 px-4 py-3 text-sm text-primary-900">
         Em breve você receberá uma confirmação.
       </p>
+
+      {isAuthenticated && <OptionalDataPrompt />}
 
       <Link to={`/${slug}`} className="mt-8 inline-block text-sm text-primary-600 hover:underline">
         Voltar ao perfil

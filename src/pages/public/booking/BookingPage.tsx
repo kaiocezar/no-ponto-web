@@ -4,9 +4,11 @@ import axios from 'axios'
 
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { ClientAuthFlow } from '@features/auth'
 import { usePublicProfile } from '@features/providers/hooks/usePublicProfile'
 import { useAvailableSlots } from '@features/scheduling/hooks/useAvailableSlots'
 import { useCreateAppointment } from '@features/scheduling/hooks/useAppointments'
+import { useAuthStore } from '@store/authStore'
 import type { AvailableSlot } from '@/types/api'
 
 type Step = 'date' | 'slot' | 'form' | 'submitting' | 'success' | 'error'
@@ -42,12 +44,14 @@ export default function BookingPage() {
 
   const { data: profile, isLoading, error } = usePublicProfile(slug ?? '')
   const createMutation = useCreateAppointment()
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+  const user = useAuthStore((s) => s.user)
 
   const [step, setStep] = useState<Step>('date')
   const [selectedDate, setSelectedDate] = useState<string>('')
   const [selectedSlot, setSelectedSlot] = useState<AvailableSlot | null>(null)
-  const [clientName, setClientName] = useState('')
-  const [clientPhone, setClientPhone] = useState('')
+  const [clientPhone, setClientPhone] = useState<string | null>(null)
+  const [clientNameOverride, setClientNameOverride] = useState<string | null>(null)
   const [clientEmail, setClientEmail] = useState('')
   const [notes, setNotes] = useState('')
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
@@ -98,8 +102,6 @@ export default function BookingPage() {
 
   const validateForm = (): boolean => {
     const e: Record<string, string> = {}
-    if (!clientName.trim()) e.clientName = 'Nome é obrigatório'
-    if (!isValidPhone(clientPhone)) e.clientPhone = 'Telefone inválido'
     if (!isValidEmail(clientEmail)) e.clientEmail = 'E-mail inválido'
     setFormErrors(e)
     return Object.keys(e).length === 0
@@ -108,6 +110,12 @@ export default function BookingPage() {
   const handleSubmit = async () => {
     if (!profile || !service || !selectedSlot) return
     if (!validateForm()) return
+    const resolvedName = clientNameOverride ?? user?.full_name ?? 'Cliente'
+    const resolvedPhone = clientPhone ?? user?.phone_number ?? ''
+    if (!isValidPhone(resolvedPhone)) {
+      setFormErrors({ clientPhone: 'Telefone de autenticacao invalido. Refaça o login.' })
+      return
+    }
     setStep('submitting')
     setGenericError(null)
     try {
@@ -115,12 +123,12 @@ export default function BookingPage() {
         provider_slug: profile.slug,
         service_id: service.id,
         start_datetime: selectedSlot.start,
-        client_name: clientName.trim(),
-        client_phone: clientPhone.trim(),
+        client_name: resolvedName,
+        client_phone: resolvedPhone,
         client_email: clientEmail.trim() || undefined,
         notes: notes.trim() || undefined,
       })
-      sessionStorage.setItem(`bookingPhone:${res.public_id}`, clientPhone.trim())
+      sessionStorage.setItem(`bookingPhone:${res.public_id}`, resolvedPhone)
       void navigate(`/${profile.slug}/agendamento/${res.public_id}`)
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 409) {
@@ -180,7 +188,22 @@ export default function BookingPage() {
         <p className="text-sm text-gray-600">{service.name}</p>
       </div>
 
-      {step === 'date' && (
+      {!isAuthenticated && (
+        <ClientAuthFlow
+          onAuthenticated={({ phone, fullName }) => {
+            setClientPhone(phone)
+            setClientNameOverride(fullName ?? null)
+          }}
+        />
+      )}
+
+      {isAuthenticated && step === 'date' && (
+        <p className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+          Telefone confirmado. Agora escolha data e horario para continuar.
+        </p>
+      )}
+
+      {isAuthenticated && step === 'date' && (
         <div className="space-y-4">
           <label className="block text-sm font-medium text-gray-700">Escolha a data</label>
           <input
@@ -199,7 +222,7 @@ export default function BookingPage() {
         </div>
       )}
 
-      {step === 'slot' && (
+      {isAuthenticated && step === 'slot' && (
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
             Data:{' '}
@@ -250,25 +273,8 @@ export default function BookingPage() {
         </div>
       )}
 
-      {step === 'form' && (
+      {isAuthenticated && step === 'form' && (
         <div className="space-y-4">
-          <Input
-            label="Nome completo"
-            value={clientName}
-            onChange={(e) => {
-              setClientName(e.target.value)
-            }}
-            error={formErrors.clientName}
-          />
-          <Input
-            label="Telefone"
-            placeholder="+55 11 99999-9999"
-            value={clientPhone}
-            onChange={(e) => {
-              setClientPhone(e.target.value)
-            }}
-            error={formErrors.clientPhone}
-          />
           <Input
             label="E-mail (opcional)"
             type="email"
@@ -278,6 +284,7 @@ export default function BookingPage() {
             }}
             error={formErrors.clientEmail}
           />
+          {formErrors.clientPhone && <p className="text-sm text-red-600">{formErrors.clientPhone}</p>}
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-gray-700">Observações (opcional)</label>
             <textarea
@@ -305,11 +312,11 @@ export default function BookingPage() {
         </div>
       )}
 
-      {step === 'submitting' && (
+      {isAuthenticated && step === 'submitting' && (
         <div className="py-12 text-center text-gray-600">Enviando agendamento…</div>
       )}
 
-      {step === 'error' && (
+      {isAuthenticated && step === 'error' && (
         <div className="space-y-4 rounded-lg border border-red-200 bg-red-50 p-4">
           <p className="text-sm text-red-800">{genericError}</p>
           <Button
