@@ -15,6 +15,7 @@ const BookingPage = lazy(() => import('@/pages/public/booking/BookingPage'))
 const BookingConfirmationPage = lazy(
   () => import('@/pages/public/booking/BookingConfirmationPage'),
 )
+const AppointmentPublicPage = lazy(() => import('@/pages/public/booking/AppointmentPublicPage'))
 const DashboardAgendaPage = lazy(() => import('@/pages/dashboard/agenda/AgendaPage'))
 const ProfileSetupPage = lazy(() => import('@/pages/dashboard/profile-setup/ProfileSetupPage'))
 const WorkingHoursPage = lazy(() => import('@/pages/dashboard/settings/WorkingHoursPage'))
@@ -61,6 +62,10 @@ export const router = createBrowserRouter([
       {
         path: '/:slug/agendamento/:publicId',
         element: withSuspense(BookingConfirmationPage),
+      },
+      {
+        path: '/agendamento/:publicId',
+        element: withSuspense(AppointmentPublicPage),
       },
       // /:slug deve ser a última rota pública para não conflitar com as anteriores
       {

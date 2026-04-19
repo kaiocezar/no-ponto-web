@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 
 import { appointmentsApi } from '../api/appointmentsApi'
-import type { CreateAppointmentPayload } from '@/types/api'
+import type { CancelAppointmentPayload, CreateAppointmentPayload } from '@/types/api'
 
 const appointmentKeys = {
   lookup: (publicId: string, phone: string) => ['appointments', 'lookup', publicId, phone] as const,
@@ -25,5 +25,15 @@ export function useAppointmentLookup(publicId: string | undefined, phone: string
     enabled: Boolean(publicId && phone),
     staleTime: 1000 * 60,
     retry: false,
+  })
+}
+
+export function useLookupAppointment(publicId: string | undefined, phone: string | undefined) {
+  return useAppointmentLookup(publicId, phone)
+}
+
+export function useCancelAppointment() {
+  return useMutation({
+    mutationFn: (payload: CancelAppointmentPayload) => appointmentsApi.cancelByCode(payload),
   })
 }

@@ -188,15 +188,44 @@ export interface AppointmentPublicBookingResponse {
 }
 
 export interface AppointmentLookup {
+  id: string
   public_id: string
   status: AppointmentStatus
   start_datetime: string
   end_datetime: string
+  can_cancel?: boolean
+  cancel_deadline?: string | null
   client_name: string
   service: { id: string; name: string; duration_minutes: number }
   provider: { slug: string; business_name: string }
   notes: string | null
   price_at_booking: string | null
+}
+
+export interface CancelAppointmentPayload {
+  public_id: string
+  phone: string
+  reason?: string
+}
+
+export interface RescheduleOption {
+  start_datetime: string
+  end_datetime: string
+}
+
+export interface RescheduleOptionsResponse {
+  slots: RescheduleOption[]
+  message?: string
+}
+
+export interface RescheduleAppointmentPayload {
+  phone: string
+  start_datetime: string
+}
+
+export interface RescheduleConflictError {
+  code: 'slot_taken'
+  available_slots: RescheduleOption[]
 }
 
 // ── Working Hours ─────────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,33 +6,34 @@
 
 @layer base {
   :root {
-    --color-primary: 59 130 246; /* blue-500 */
+    --color-primary: 22 163 74; /* green-600 */
     --color-background: 255 255 255;
-    --color-foreground: 17 24 39; /* gray-900 */
+    --color-foreground: 15 23 42; /* slate-900 */
   }
 
   * {
-    @apply border-gray-200;
+    @apply border-slate-200;
   }
 
   body {
-    @apply bg-white text-gray-900 antialiased;
-    font-family: 'Inter', system-ui, sans-serif;
+    @apply bg-white text-slate-900 antialiased;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   }
 
   /* Scrollbar customization */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-gray-100;
+    @apply bg-slate-100;
   }
   ::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-gray-300;
+    @apply rounded-full;
+    background-color: #cbd5e1;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-400;
+    @apply bg-slate-400;
   }
 }
 
