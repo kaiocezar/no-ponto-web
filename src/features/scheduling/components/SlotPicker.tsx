@@ -1,5 +1,6 @@
 import type { AvailableSlot } from '@/types/api'
 import { useAvailability } from '../hooks/useAvailability'
+import { SlotGrid, type SlotGridItem } from './SlotGrid'
 
 interface SlotPickerProps {
   slug: string
@@ -53,32 +54,23 @@ export function SlotPicker({
     )
   }
 
+  const gridSlots: SlotGridItem[] = slots.map((slot) => ({
+    start_datetime: slot.start,
+    end_datetime: slot.end,
+  }))
+
   return (
-    <div
-      role="list"
-      aria-label="Horários disponíveis"
-      className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5"
-    >
-      {slots.map((slot) => {
-        const isSelected = slot.start === selectedSlot
-        return (
-          <button
-            key={slot.start}
-            role="listitem"
-            onClick={() => { onSelect(slot) }}
-            aria-pressed={isSelected}
-            aria-label={`Horário ${formatTime(slot.start)}`}
-            className={[
-              'rounded-lg border px-3 py-2 text-sm font-medium transition-colors',
-              isSelected
-                ? 'border-primary-500 bg-primary-500 text-white'
-                : 'border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50',
-            ].join(' ')}
-          >
-            {formatTime(slot.start)}
-          </button>
-        )
-      })}
-    </div>
+    <SlotGrid
+      slots={gridSlots}
+      selectedStartDatetime={selectedSlot}
+      onSelect={(slot) => {
+        onSelect({
+          start: slot.start_datetime,
+          end: slot.end_datetime,
+          staff_id: staffId ?? null,
+        })
+      }}
+      formatLabel={(slot) => formatTime(slot.start_datetime)}
+    />
   )
 }
