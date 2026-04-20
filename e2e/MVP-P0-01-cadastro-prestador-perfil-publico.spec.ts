@@ -21,7 +21,7 @@ async function registerAndLogin(page: Page, email: string, password = 'Teste@123
   await page.goto('/login')
   await page.getByLabel('Email').fill(email)
   await page.getByLabel('Senha').fill(password)
-  await page.getByRole('button', { name: 'Entrar' }).click()
+  await page.locator('form').getByRole('button', { name: 'Entrar' }).click()
   await expect(page).toHaveURL(/\/painel/, { timeout: 10000 })
 
   return tokens.access
@@ -112,7 +112,7 @@ test.describe('MVP-P0-01 — Cadastro de Prestador e Perfil Público', () => {
     await page.goto('/login')
     await page.getByLabel('Email').fill(email)
     await page.getByLabel('Senha').fill('Teste@12345')
-    await page.getByRole('button', { name: 'Entrar' }).click()
+    await page.locator('form').getByRole('button', { name: 'Entrar' }).click()
     await expect(page).toHaveURL(/\/painel/, { timeout: 10000 })
 
     await page.goto('/configurar-perfil')
@@ -141,7 +141,7 @@ test.describe('MVP-P0-01 — Cadastro de Prestador e Perfil Público', () => {
     await page.goto('/login')
     await page.getByLabel('Email').fill(email)
     await page.getByLabel('Senha').fill('Teste@12345')
-    await page.getByRole('button', { name: 'Entrar' }).click()
+    await page.locator('form').getByRole('button', { name: 'Entrar' }).click()
     await expect(page).toHaveURL(/\/painel/, { timeout: 10000 })
 
     await page.goto('/configurar-perfil')
@@ -169,7 +169,7 @@ test.describe('MVP-P0-01 — Cadastro de Prestador e Perfil Público', () => {
     await page.goto('/login')
     await page.getByLabel('Email').fill(email)
     await page.getByLabel('Senha').fill('Teste@12345')
-    await page.getByRole('button', { name: 'Entrar' }).click()
+    await page.locator('form').getByRole('button', { name: 'Entrar' }).click()
     await expect(page).toHaveURL(/\/painel/, { timeout: 10000 })
 
     await page.goto('/configurar-perfil')
@@ -232,10 +232,42 @@ test.describe('MVP-P0-01 — Cadastro de Prestador e Perfil Público', () => {
       headers: { Authorization: `Bearer ${token}` },
     })
 
+    // Aguarda o backend expor o perfil público para evitar flutuação de timing.
+    await expect
+      .poll(
+        async () => {
+          const res = await page.request.get(`${API_BASE}/providers/${slug}/`)
+          return res.status()
+        },
+        { timeout: 15_000 },
+      )
+      .toBe(200)
+
+    await page.route(`**/api/v1/providers/${slug}/reviews/summary/`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          average_rating: 0,
+          total_reviews: 0,
+          rating_distribution: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
+        }),
+      })
+    })
+    await page.route(`**/api/v1/providers/${slug}/reviews/`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([]),
+      })
+    })
+
     // Acessa perfil público
     await page.goto(`/${slug}`)
 
-    await expect(page.getByText(`Clínica E2E ${suffix}`)).toBeVisible({ timeout: 10000 })
+    await expect(page.getByRole('heading', { name: new RegExp(`Cl[íi]nica E2E ${suffix}`) })).toBeVisible({
+      timeout: 10_000,
+    })
     await expect(page.getByText('Fisioterapia')).toBeVisible()
     await expect(page.getByText('São Paulo')).toBeVisible()
 

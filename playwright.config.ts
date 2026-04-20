@@ -17,7 +17,7 @@ export default defineConfig({
   timeout: 30000,
   webServer: [
     {
-      command: `cd ${path.join(repoRoot, 'backend')} && uv run python manage.py runserver 8001`,
+      command: `cd ${path.join(repoRoot, 'backend')} && uv run python manage.py migrate && uv run python manage.py runserver 8001`,
       url: 'http://localhost:8001/api/health/',
       reuseExistingServer: true,
       timeout: 20000,

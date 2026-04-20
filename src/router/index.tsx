@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router-dom'
 
 import { PublicLayout } from '@/components/shared/PublicLayout'
 import { DashboardLayout } from '@/components/shared/DashboardLayout'
@@ -17,12 +17,18 @@ const BookingConfirmationPage = lazy(
 )
 const AppointmentPublicPage = lazy(() => import('@/pages/public/booking/AppointmentPublicPage'))
 const DashboardAgendaPage = lazy(() => import('@/pages/dashboard/agenda/AgendaPage'))
+const DashboardHomePage = lazy(() => import('@/pages/dashboard/home/DashboardHomePage'))
+const ClientsPage = lazy(() => import('@/pages/dashboard/clients/ClientsPage'))
+const ClientDetailPage = lazy(() => import('@/pages/dashboard/clients/ClientDetailPage'))
+const ProviderReviewsPage = lazy(() => import('@/pages/dashboard/reviews/ProviderReviewsPage'))
 const ProfileSetupPage = lazy(() => import('@/pages/dashboard/profile-setup/ProfileSetupPage'))
 const WorkingHoursPage = lazy(() => import('@/pages/dashboard/settings/WorkingHoursPage'))
 const ScheduleBlocksPage = lazy(() => import('@/pages/dashboard/settings/ScheduleBlocksPage'))
 const ServicesPage = lazy(() => import('@/pages/dashboard/services/ServicesPage'))
 const StaffPage = lazy(() => import('@/pages/dashboard/staff/StaffPage'))
 const AcceptInvitePage = lazy(() => import('@/pages/public/invite/AcceptInvitePage'))
+const ReviewPage = lazy(() => import('@/pages/public/review/ReviewPage'))
+const MyAppointmentsPage = lazy(() => import('@/pages/account/appointments/MyAppointmentsPage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 
 function LoadingFallback() {
@@ -74,6 +80,10 @@ export const router = createBrowserRouter([
         path: '/convite',
         element: withSuspense(AcceptInvitePage),
       },
+      {
+        path: '/avaliar/:token',
+        element: withSuspense(ReviewPage),
+      },
       // /:slug deve ser a última rota pública para não conflitar com as anteriores
       {
         path: '/:slug',
@@ -92,11 +102,23 @@ export const router = createBrowserRouter([
     children: [
       {
         path: '/painel',
-        element: <Navigate to="/painel/agenda" replace />,
+        element: withSuspense(DashboardHomePage),
       },
       {
         path: '/painel/agenda',
         element: withSuspense(DashboardAgendaPage),
+      },
+      {
+        path: '/painel/clientes',
+        element: withSuspense(ClientsPage),
+      },
+      {
+        path: '/painel/clientes/:phone',
+        element: withSuspense(ClientDetailPage),
+      },
+      {
+        path: '/painel/avaliacoes',
+        element: withSuspense(ProviderReviewsPage),
       },
       {
         path: '/configurar-perfil',
@@ -117,6 +139,19 @@ export const router = createBrowserRouter([
       {
         path: '/painel/equipe',
         element: withSuspense(StaffPage),
+      },
+    ],
+  },
+  {
+    element: (
+      <ProtectedRoute requiredRole="client">
+        <PublicLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: '/minha-conta/agendamentos',
+        element: withSuspense(MyAppointmentsPage),
       },
     ],
   },

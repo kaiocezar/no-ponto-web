@@ -23,7 +23,7 @@ async function setupProvider(page: Page, email: string, password = 'Teste@12345'
   await page.goto('/login')
   await page.getByLabel('Email').fill(email)
   await page.getByLabel('Senha').fill(password)
-  await page.getByRole('button', { name: 'Entrar' }).click()
+  await page.locator('form').getByRole('button', { name: 'Entrar' }).click()
 
   // Aguarda redirecionamento para o painel
   await expect(page).toHaveURL(/\/painel/, { timeout: 10000 })
