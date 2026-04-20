@@ -383,3 +383,115 @@ export interface Review {
   replied_at: string | null
   created_at: string
 }
+
+export interface DashboardPeriodMetrics {
+  total: number
+  confirmed: number
+  pending_confirmation: number
+  cancelled: number
+  completed: number
+  no_show: number
+}
+
+export interface DashboardWeekMetrics {
+  total: number
+  confirmed: number
+  cancelled: number
+  cancellation_rate: number
+}
+
+export interface DashboardMonthMetrics {
+  total: number
+}
+
+export interface DashboardNextAppointment {
+  id: string
+  public_id: string
+  client_name: string
+  service_name: string
+  start_datetime: string
+  status: AppointmentStatus
+}
+
+export interface ProviderDashboardResponse {
+  today: DashboardPeriodMetrics
+  week: DashboardWeekMetrics
+  month: DashboardMonthMetrics
+  next_appointments: DashboardNextAppointment[]
+}
+
+export interface ProviderClient {
+  client_phone: string
+  client_name: string
+  total_appointments: number
+  last_appointment_date: string
+}
+
+export interface ProviderClientAppointment {
+  id: string
+  public_id: string
+  client_name: string
+  client_phone: string
+  service_name: string
+  staff_name: string | null
+  start_datetime: string
+  status: AppointmentStatus
+  price_at_booking: string | null
+}
+
+export interface ClientNote {
+  id: string
+  client_phone: string
+  note: string
+  created_at: string
+  updated_at: string
+  created_by_name: string | null
+}
+
+export interface CreateClientNotePayload {
+  note: string
+}
+
+export type MyAppointmentsFilterStatus = 'upcoming' | 'past'
+
+export type ReviewStatus = 'pending' | 'completed' | null
+
+export interface MyAppointment {
+  id: string
+  public_id: string
+  provider_name: string
+  provider_slug: string
+  service_name: string
+  start_datetime: string
+  end_datetime: string
+  status: AppointmentStatus
+  review_status: ReviewStatus
+  review_token: string | null
+  review_rating: number | null
+}
+
+export interface ReviewByTokenData {
+  provider_name: string
+  service_name: string
+  start_datetime: string
+  client_name: string
+}
+
+export interface SubmitReviewPayload {
+  rating: 1 | 2 | 3 | 4 | 5
+  comment?: string
+}
+
+export interface ProviderReview extends Review {
+  is_public: boolean
+}
+
+export interface ReviewReplyPayload {
+  reply: string
+}
+
+export interface PublicReviewSummary {
+  average_rating: number
+  total_reviews: number
+  rating_distribution: Record<'1' | '2' | '3' | '4' | '5', number>
+}

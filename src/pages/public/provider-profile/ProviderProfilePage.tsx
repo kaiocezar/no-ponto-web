@@ -2,6 +2,9 @@ import { Link, useParams } from 'react-router-dom'
 import axios from 'axios'
 
 import { usePublicProfile } from '@features/providers/hooks/usePublicProfile'
+import { ReviewCard } from '@features/reviews/components/ReviewCard'
+import { ReviewSummary } from '@features/reviews/components/ReviewSummary'
+import { usePublicReviewSummary, usePublicReviews } from '@features/reviews/hooks/usePublicReviews'
 import type { Service } from '@/types/api'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -70,6 +73,9 @@ function ServiceCard({ service, slug }: ServiceCardProps) {
 export default function ProviderProfilePage() {
   const { slug } = useParams<{ slug: string }>()
   const { data: profile, isLoading, error } = usePublicProfile(slug ?? '')
+  const { data: summary } = usePublicReviewSummary(slug ?? '')
+  const { data: publicReviews } = usePublicReviews(slug ?? '')
+  const reviews = publicReviews?.data ?? []
   const services = profile?.services ?? []
 
   if (isLoading) {
@@ -165,6 +171,20 @@ export default function ProviderProfilePage() {
           </a>
         </div>
       )}
+
+      {summary ? (
+        <div className="mb-6">
+          <ReviewSummary summary={summary} />
+        </div>
+      ) : null}
+
+      {reviews.length > 0 ? (
+        <div className="space-y-3">
+          {reviews.map((review) => (
+            <ReviewCard key={review.id} review={review} />
+          ))}
+        </div>
+      ) : null}
     </div>
   )
 }

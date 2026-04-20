@@ -43,6 +43,27 @@ function CalendarIcon() {
   )
 }
 
+function DashboardIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 13h8V3H3z" />
+      <path d="M13 21h8v-6h-8z" />
+      <path d="M13 10h8V3h-8z" />
+      <path d="M3 21h8v-6H3z" />
+    </svg>
+  )
+}
+
 function ServicesIcon() {
   return (
     <svg
@@ -86,6 +107,45 @@ function TeamIcon() {
   )
 }
 
+function UsersIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  )
+}
+
+function StarIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2" />
+    </svg>
+  )
+}
+
 function LogoIcon() {
   return (
     <svg
@@ -108,10 +168,25 @@ function LogoIcon() {
 
 const navItems: NavItem[] = [
   {
+    to: '/painel',
+    label: 'Painel',
+    icon: <DashboardIcon />,
+  },
+  {
     to: '/painel/agenda',
     label: 'Agenda',
     icon: <CalendarIcon />,
     showPendingBadge: true,
+  },
+  {
+    to: '/painel/clientes',
+    label: 'Clientes',
+    icon: <UsersIcon />,
+  },
+  {
+    to: '/painel/avaliacoes',
+    label: 'Avaliações',
+    icon: <StarIcon />,
   },
   {
     to: '/painel/servicos',
