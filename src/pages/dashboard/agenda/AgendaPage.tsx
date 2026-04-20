@@ -10,10 +10,12 @@ import toast from 'react-hot-toast'
 import { AgendaHeader, type AgendaCalendarView } from '@features/appointments/provider/components/AgendaHeader'
 import { AppointmentDetailDrawer } from '@features/appointments/provider/components/AppointmentDetailDrawer'
 import { ManualBookingModal } from '@features/appointments/provider/components/ManualBookingModal'
+import { StaffFilterTabs } from '@features/appointments/provider/components/StaffFilterTabs'
 import { useCalendarEvents } from '@features/appointments/provider/hooks/useCalendarEvents'
 import { useNewAppointmentDetector } from '@features/appointments/provider/hooks/useNewAppointmentDetector'
 import { useProviderAppointments } from '@features/appointments/provider/hooks/useProviderAppointments'
 import { useProviderProfile } from '@features/providers/hooks/useProviderProfile'
+import { useProviderStaff } from '@features/staff/hooks/useProviderStaff'
 
 import type { ProviderAppointmentListRow } from '@/types/api'
 
@@ -39,8 +41,12 @@ export default function AgendaPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
+  const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null)
 
-  const listQuery = useProviderAppointments(range.from, range.to)
+  const { data: staff = [] } = useProviderStaff()
+  const activeStaff = staff.filter((s) => s.is_active)
+
+  const listQuery = useProviderAppointments(range.from, range.to, undefined, selectedStaffId ?? undefined)
   const appointments = listQuery.data ?? []
   const events = useCalendarEvents(appointments)
 
@@ -66,6 +72,15 @@ export default function AgendaPage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
+      {activeStaff.length > 1 && (
+        <div className="border-b border-slate-100 bg-white px-4 py-2">
+          <StaffFilterTabs
+            staff={activeStaff}
+            selectedStaffId={selectedStaffId}
+            onChange={setSelectedStaffId}
+          />
+        </div>
+      )}
       <AgendaHeader
         getCalendarApi={() => calendarApi}
         calendarView={calendarView}

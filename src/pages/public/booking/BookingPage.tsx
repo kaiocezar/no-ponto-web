@@ -4,14 +4,16 @@ import axios from 'axios'
 
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { Avatar } from '@/components/ui/Avatar'
 import { ClientAuthFlow } from '@features/auth'
 import { usePublicProfile } from '@features/providers/hooks/usePublicProfile'
+import { usePublicStaff } from '@features/staff/hooks/usePublicStaff'
 import { useAvailableSlots } from '@features/scheduling/hooks/useAvailableSlots'
 import { useCreateAppointment } from '@features/scheduling/hooks/useAppointments'
 import { useAuthStore } from '@store/authStore'
-import type { AvailableSlot } from '@/types/api'
+import type { AvailableSlot, Staff } from '@/types/api'
 
-type Step = 'date' | 'slot' | 'form' | 'submitting' | 'success' | 'error'
+type Step = 'staff' | 'date' | 'slot' | 'form' | 'submitting' | 'success' | 'error'
 
 function isValidPhone(value: string): boolean {
   const digits = value.replace(/\D/g, '')
@@ -47,7 +49,17 @@ export default function BookingPage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
   const user = useAuthStore((s) => s.user)
 
-  const [step, setStep] = useState<Step>('date')
+  const service = useMemo(
+    () => profile?.services?.find((s) => s.id === serviceId),
+    [profile, serviceId],
+  )
+
+  const { data: publicStaff = [] } = usePublicStaff(slug ?? '', serviceId || undefined)
+  const hasMultipleStaff = publicStaff.length > 1
+
+  const [selectedStaff, setSelectedStaff] = useState<Staff | null | 'any'>('any')
+  const initialStep: Step = hasMultipleStaff ? 'staff' : 'date'
+  const [step, setStep] = useState<Step>(initialStep)
   const [selectedDate, setSelectedDate] = useState<string>('')
   const [selectedSlot, setSelectedSlot] = useState<AvailableSlot | null>(null)
   const [clientPhone, setClientPhone] = useState<string | null>(null)
@@ -58,10 +70,8 @@ export default function BookingPage() {
   const [slotMessage, setSlotMessage] = useState<string | null>(null)
   const [genericError, setGenericError] = useState<string | null>(null)
 
-  const service = useMemo(
-    () => profile?.services?.find((s) => s.id === serviceId),
-    [profile, serviceId],
-  )
+  const resolvedStaffId =
+    selectedStaff === 'any' || selectedStaff === null ? undefined : selectedStaff.id
 
   const availability = useAvailableSlots({
     slug: slug ?? '',
@@ -76,7 +86,11 @@ export default function BookingPage() {
   const goBack = useCallback(() => {
     setGenericError(null)
     setSlotMessage(null)
-    if (step === 'slot') {
+    if (step === 'staff') {
+      // no-op
+    } else if (step === 'date') {
+      if (hasMultipleStaff) setStep('staff')
+    } else if (step === 'slot') {
       setStep('date')
       setSelectedSlot(null)
     } else if (step === 'form') {
@@ -84,7 +98,7 @@ export default function BookingPage() {
     } else if (step === 'error') {
       setStep('form')
     }
-  }, [step])
+  }, [step, hasMultipleStaff])
 
   const handleDateContinue = () => {
     if (!selectedDate) return
@@ -122,6 +136,7 @@ export default function BookingPage() {
       const res = await createMutation.mutateAsync({
         provider_slug: profile.slug,
         service_id: service.id,
+        staff_id: resolvedStaffId,
         start_datetime: selectedSlot.start,
         client_name: resolvedName,
         client_phone: resolvedPhone,
@@ -195,6 +210,55 @@ export default function BookingPage() {
             setClientNameOverride(fullName ?? null)
           }}
         />
+      )}
+
+      {isAuthenticated && step === 'staff' && (
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-gray-700">Escolha o profissional</p>
+          <div className="grid grid-cols-1 gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedStaff('any')
+                setStep('date')
+              }}
+              className={`flex items-center gap-3 rounded-lg border-2 px-4 py-3 text-left transition-colors ${
+                selectedStaff === 'any'
+                  ? 'border-primary-500 bg-primary-50'
+                  : 'border-slate-200 hover:border-primary-300'
+              }`}
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-lg">
+                ✦
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-slate-800">Qualquer disponível</p>
+                <p className="text-xs text-slate-500">Primeiro horário disponível</p>
+              </div>
+            </button>
+            {publicStaff.map((member) => (
+              <button
+                key={member.id}
+                type="button"
+                onClick={() => {
+                  setSelectedStaff(member)
+                  setStep('date')
+                }}
+                className={`flex items-center gap-3 rounded-lg border-2 px-4 py-3 text-left transition-colors ${
+                  selectedStaff !== 'any' && selectedStaff?.id === member.id
+                    ? 'border-primary-500 bg-primary-50'
+                    : 'border-slate-200 hover:border-primary-300'
+                }`}
+              >
+                <Avatar name={member.name} size={36} />
+                <div>
+                  <p className="text-sm font-semibold text-slate-800">{member.name}</p>
+                  <p className="text-xs text-slate-500 capitalize">{member.role}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
       )}
 
       {isAuthenticated && step === 'date' && (

@@ -146,17 +146,29 @@ export interface CreateServicePayload {
 
 export interface Service {
   id: string
+  provider: string
   name: string
-  description: string | null
-  duration_minutes: number
-  buffer_after: number
+  description: string
   price: string | null
+  duration_minutes: number
+  color: string | null
   currency: string
   requires_deposit: boolean
   deposit_amount: string | null
-  color: string | null
+  max_clients: number
+  buffer_after: number
   is_active: boolean
   is_online: boolean
+  staff: Pick<Staff, 'id' | 'name' | 'role' | 'avatar_url'>[]
+  created_at: string
+  updated_at: string
+}
+
+export interface InviteData {
+  provider_name: string
+  staff_name: string
+  role: string
+  invite_email: string
 }
 
 // ── Staff ─────────────────────────────────────────────────────────────────────
@@ -167,6 +179,8 @@ export interface Staff {
   avatar_url: string | null
   role: StaffRole
   is_active: boolean
+  invite_email: string | null
+  user: { id: string; name: string } | null
 }
 
 // ── Appointment ───────────────────────────────────────────────────────────────
@@ -194,6 +208,7 @@ export interface Appointment {
 export interface CreateAppointmentPayload {
   provider_slug: string
   service_id: string
+  staff_id?: string
   start_datetime: string
   client_name: string
   client_phone: string
@@ -215,6 +230,7 @@ export interface ProviderAppointmentServiceBrief {
   id: string
   name: string
   duration_minutes: number
+  color?: string | null
 }
 
 export interface ProviderAppointmentListRow {

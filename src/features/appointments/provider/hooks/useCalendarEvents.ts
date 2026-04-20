@@ -20,15 +20,18 @@ function eventTitle(a: ProviderAppointmentListRow): string {
 export function useCalendarEvents(appointments: ProviderAppointmentListRow[]): EventInput[] {
   return useMemo(
     () =>
-      appointments.map((a) => ({
-        id: a.id,
-        title: eventTitle(a),
-        start: a.start_datetime,
-        end: a.end_datetime,
-        backgroundColor: STATUS_COLORS[a.status],
-        borderColor: STATUS_COLORS[a.status],
-        extendedProps: { status: a.status },
-      })),
+      appointments.map((a) => {
+        const color = a.service.color ?? STATUS_COLORS[a.status]
+        return {
+          id: a.id,
+          title: eventTitle(a),
+          start: a.start_datetime,
+          end: a.end_datetime,
+          backgroundColor: color,
+          borderColor: color,
+          extendedProps: { status: a.status },
+        }
+      }),
     [appointments],
   )
 }
