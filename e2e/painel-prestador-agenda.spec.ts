@@ -14,7 +14,7 @@ test.describe('Painel do prestador — agenda', () => {
 
     await page.getByLabel('Email').fill(PROVIDER_EMAIL!)
     await page.getByLabel('Senha').fill(PROVIDER_PASSWORD!)
-    await page.getByRole('button', { name: 'Entrar' }).click()
+    await page.locator('form').getByRole('button', { name: 'Entrar' }).click()
 
     await expect(page).toHaveURL(/\/painel\/agenda/)
     await expect(page.locator('.fc')).toBeVisible({ timeout: 20_000 })

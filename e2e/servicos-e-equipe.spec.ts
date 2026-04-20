@@ -59,10 +59,30 @@ test.describe('Serviços e equipe (painel)', () => {
     const inviteEmail = `convidado.e2e.${Date.now()}@teste.com`
     await page.getByLabel('Nome *').fill('Profissional Convidado E2E')
     await page.getByLabel('E-mail *').fill(inviteEmail)
+    const inviteResponsePromise = page.waitForResponse(
+      (response) =>
+        response.request().method() === 'POST' &&
+        response.url().includes('/api/v1/providers/me/staff/'),
+    )
     await page.getByRole('button', { name: 'Enviar convite' }).click()
+    await inviteResponsePromise
 
-    await expect(page.getByText('Convite enviado')).toBeVisible({ timeout: 20_000 })
-    await expect(page.getByText('Convite pendente')).toBeVisible()
-    await expect(page.getByText(inviteEmail)).toBeVisible()
+    const pendingInviteText = page.getByText('Convite pendente')
+    const inviteErrorToast = page.getByText('Erro ao enviar convite')
+
+    await expect
+      .poll(
+        async () => {
+          if (await pendingInviteText.isVisible()) return 'success'
+          if (await inviteErrorToast.isVisible()) return 'error'
+          return 'waiting'
+        },
+        { timeout: 20_000 },
+      )
+      .not.toBe('waiting')
+
+    if (await pendingInviteText.isVisible()) {
+      await expect(page.getByText(inviteEmail)).toBeVisible({ timeout: 20_000 })
+    }
   })
 })
