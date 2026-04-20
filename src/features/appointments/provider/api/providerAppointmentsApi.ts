@@ -12,6 +12,7 @@ export interface ProviderAppointmentListParams {
   date_from?: string
   date_to?: string
   status?: string
+  staff_id?: string
 }
 
 export const providerAppointmentsApi = {

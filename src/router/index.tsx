@@ -20,6 +20,9 @@ const DashboardAgendaPage = lazy(() => import('@/pages/dashboard/agenda/AgendaPa
 const ProfileSetupPage = lazy(() => import('@/pages/dashboard/profile-setup/ProfileSetupPage'))
 const WorkingHoursPage = lazy(() => import('@/pages/dashboard/settings/WorkingHoursPage'))
 const ScheduleBlocksPage = lazy(() => import('@/pages/dashboard/settings/ScheduleBlocksPage'))
+const ServicesPage = lazy(() => import('@/pages/dashboard/services/ServicesPage'))
+const StaffPage = lazy(() => import('@/pages/dashboard/staff/StaffPage'))
+const AcceptInvitePage = lazy(() => import('@/pages/public/invite/AcceptInvitePage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 
 function LoadingFallback() {
@@ -67,6 +70,10 @@ export const router = createBrowserRouter([
         path: '/agendamento/:publicId',
         element: withSuspense(AppointmentPublicPage),
       },
+      {
+        path: '/convite',
+        element: withSuspense(AcceptInvitePage),
+      },
       // /:slug deve ser a última rota pública para não conflitar com as anteriores
       {
         path: '/:slug',
@@ -102,6 +109,14 @@ export const router = createBrowserRouter([
       {
         path: '/painel/configuracoes/bloqueios',
         element: withSuspense(ScheduleBlocksPage),
+      },
+      {
+        path: '/painel/servicos',
+        element: withSuspense(ServicesPage),
+      },
+      {
+        path: '/painel/equipe',
+        element: withSuspense(StaffPage),
       },
     ],
   },
